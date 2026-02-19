@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Classic Movies Ug</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{
+    margin:0;
+    background:#0b0b0b;
+    color:white;
+    font-family:Arial,Helvetica,sans-serif;
+}
+/* NAVBAR */
+.navbar{
+    display:flex;
+    justify-content:space-between;
+    padding:18px 30px;
+    background:black;
+}
+.nav-left{
+    color:red;
+    font-size:26px;
+    font-weight:bold;
+}
+.nav-right a{
+    color:white;
+    text-decoration:none;
+    margin-left:20px;
+}
+/* HERO */
+.hero-carousel{
+    position:relative;
+    width:100%;
+    height:80vh;
+    overflow:hidden;
+}
+.hero-slide{
+    position:absolute;
+    inset:0;
+    background-size:cover;
+    background-position:center;
+    opacity:0;
+    transition:opacity 1s ease;
+    display:flex;
+    align-items:flex-end;
+}
+.hero-slide.active{
+    opacity:1;
+    z-index:2;
+}
+.hero-content{
+    padding:50px;
+    max-width:600px;
+    text-shadow:2px 2px 6px black;
+}
+.hero-content h1{
+    font-size:3rem;
+    margin-bottom:15px;
+}
+.hero-content p{
+    font-size:1.3rem;
+    margin-bottom:20px;
+}
+.btn-primary{
+    background:#e50914;
+    color:white;
+    padding:14px 32px;
+    text-decoration:none;
+    font-weight:bold;
+    border-radius:5px;
+}
+.btn-primary:hover{
+    background:#b00710;
+}
+/* SEARCH */
+.search-container{
+    display:flex;
+    justify-content:center;
+    padding:20px;
+}
+.search-container input{
+    width:100%;
+    max-width:500px;
+    padding:14px 18px;
+    border-radius:30px;
+    border:none;
+    background:#1a1a1a;
+    color:white;
+    font-size:16px;
+}
+/* MOVIE GROUPS */
+.movie-group{
+    max-width:1000px;
+    margin:40px auto;
+}
+.movie-group h2{
+    margin-left:10px;
+    font-size:1.8rem;
+}
+/* HORIZONTAL ROW */
+.scroll-container{
+    overflow-x:auto;
+    padding:10px;
+}
+.scroll-row{
+    display:flex;
+    gap:15px;
+    flex-wrap:nowrap;
+}
+.scroll-container::-webkit-scrollbar{
+    height:8px;
+}
+.scroll-container::-webkit-scrollbar-thumb{
+    background:rgba(255,255,255,0.3);
+    border-radius:4px;
+}
+/* MOVIE CARD */
+.movie-thumb{
+    flex:0 0 auto;
+    width:160px;
+    height:240px;
+    background-size:cover;
+    background-position:center;
+    border-radius:12px;
+    box-shadow:0 6px 12px rgba(0,0,0,0.5);
+    transition:transform .3s, box-shadow .3s;
+}
+.movie-thumb:hover{
+    transform:translateY(-10px);
+    box-shadow:0 12px 24px rgba(255,0,0,.7);
+}
+/* FOOTER */
+.footer{
+    text-align:center;
+    padding:20px;
+    background:#111;
+    color:#777;
+}
+.movie-thumb{
+    width: 160px;
+    height: 240px;
+    background-size: contain; /* instead of cover */
+    background-repeat: no-repeat;
+    background-position: center;
+}
+/* ===== MOBILE ADJUSTMENTS ===== */
+@media (max-width: 600px) {
+    .hero-content {
+        padding: 20px;
+        max-width: 90%;
+    }
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    .hero-content p {
+        font-size: 1rem;
+    }
+    .movie-thumb {
+        width: 120px;
+        height: 180px;
+    }
+}
+.movie-group h2 {
+    font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+    font-weight: 700;
+    font-size: 1.8rem; /* can increase slightly if needed */
+    color: #fff;
+    text-transform: uppercase; /* optional for streaming feel */
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+.movie-thumb::after {
+    content: attr(data-title);
+    display: block;
+    text-align: center;
+    color: white;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.movie-group h2 {
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+}
+.movie-group h2 {
+    font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem; /* reduced from 1.8rem */
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+}
+</style>
+</head>
+<body>
+<header class="navbar">
+    <div class="nav-left">Classic Movies Ug</div>
+    <div class="nav-right">
+        <a href="#hero-carousel">Home</a>
+        <a href="#movie-groups">Movies</a>       
+    </div>
+</header>
+<section class="hero-carousel" id="hero-carousel"></section>
+<section class="search-container">
+    <input type="text" id="searchInput" placeholder="Search movies...">
+</section>
+<section id="movie-groups"></section>
+<footer class="footer">© 2026 MovieBox+ • Uganda</footer>
+<script>
+const categories = ['action','cartoon','scifi','inspirational','Horror_Thriller','Teen'];
+let heroSlides = [];
+let allMovies = [];
+/* LOAD MOVIES */
+async function loadMovies(){
+    const res = await fetch("/movies");
+    allMovies = await res.json();
+    buildHero();
+    buildMovieGroups();
+    initSearch();
+}
+/* HERO */
+function buildHero(){
+    heroSlides = [{
+        title:"Welcome to Classic Movies Ug",
+        description:"Watch anytime, anywhere. Buy, stream, or download instantly!",
+        link:"#",
+        poster:"/static/images/classic-movie-bg.jpg"
+    }];
+    allMovies.filter(m=>m.category==="trending").forEach(m=>{
+        heroSlides.push({
+            title:m.title,
+            description:"",
+            link:`player.html?movie=${m.movie}`,
+            poster:`/static/images/${m.poster}`
+        });
+    });
+    const hero = document.getElementById("hero-carousel");
+    hero.innerHTML="";
+    heroSlides.forEach((s,i)=>{
+        const slide=document.createElement("div");
+        slide.className="hero-slide"+(i===0?" active":"");
+        slide.style.backgroundImage=`url('${s.poster}')`;
+        slide.innerHTML=`
+            <div class="hero-content">
+                <h1>${s.title}</h1>
+                <p>${s.description}</p>
+                <a class="btn-primary" href="${s.link}">Watch Now</a>
+            </div>`;
+        hero.appendChild(slide);
+    });
+    let idx=0;
+    setInterval(()=>{
+        const slides=document.querySelectorAll(".hero-slide");
+        slides[idx].classList.remove("active");
+        idx=(idx+1)%slides.length;
+        slides[idx].classList.add("active");
+    },4000);
+}
+/* MOVIE ROWS */
+function buildMovieGroups(){
+    const container=document.getElementById("movie-groups");
+    container.innerHTML="";
+    categories.forEach(cat=>{
+        const movies=allMovies.filter(m=>m.category===cat);
+        if(!movies.length) return;
+        const section=document.createElement("section");
+        section.className="movie-group";
+        section.innerHTML=`
+            <h2>${cat.replace("_"," ").toUpperCase()} Movies</h2>
+            <div class="scroll-container">
+                <div class="scroll-row"></div>
+            </div>`;
+        const row=section.querySelector(".scroll-row");
+        movies.forEach(m=>{
+            const a=document.createElement("a");
+            a.href=`player.html?movie=${m.movie}`;
+            a.className="movie-thumb";
+            a.style.backgroundImage=`url('/static/images/${m.poster}')`;
+            row.appendChild(a);
+        });
+        container.appendChild(section);
+        startAutoScroll(section.querySelector(".scroll-container"));
+    });
+}
+/* ✅ FIXED AUTO SCROLL (ONLY FIX) */
+function startAutoScroll(row){
+    let step = 175;
+    let interval = 2500;
+    let autoScroll;
+    function scrollStep(){
+        let max = row.scrollWidth - row.clientWidth;
+        if(row.scrollLeft + step >= max){
+            row.style.scrollBehavior = "auto";
+            row.scrollLeft = 0;
+            row.style.scrollBehavior = "smooth";
+        } else {
+            row.scrollBy({left: step, behavior: "smooth"});
+        }
+    }
+    function start(){
+        autoScroll = setInterval(scrollStep, interval);
+    }
+    function stop(){
+        clearInterval(autoScroll);
+    }
+    row.addEventListener("mouseenter", stop);
+    row.addEventListener("mouseleave", start);
+    row.addEventListener("touchstart", stop, {passive:true});
+    row.addEventListener("touchend", start, {passive:true});
+    start();
+}
+/* SEARCH */
+function initSearch(){
+    const input=document.getElementById("searchInput");
+    input.addEventListener("input",()=>{
+        const q=input.value.toLowerCase().trim();
+        if(!q){
+            buildMovieGroups();
+            return;
+        }
+        const unique={};
+        allMovies.forEach(m=>{
+            if(m.title.toLowerCase().includes(q)){
+                unique[m.movie]=m;
+            }
+        });
+        const container=document.getElementById("movie-groups");
+        container.innerHTML=`
+            <section class="movie-group">
+                <h2>Search Results</h2>
+                <div class="scroll-container">
+                    <div class="scroll-row"></div>
+                </div>
+            </section>`;
+        const row=container.querySelector(".scroll-row");
+        Object.values(unique).forEach(m=>{
+            const a=document.createElement("a");
+            a.href=`player.html?movie=${m.movie}`;
+            a.className="movie-thumb";
+            a.style.backgroundImage=`url('/static/images/${m.poster}')`;
+            row.appendChild(a);
+        });
+    });
+}
+window.onload=loadMovies;
+</script>
+</body>
+</html>

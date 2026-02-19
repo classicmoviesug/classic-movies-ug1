@@ -1,0 +1,635 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #0b0b0b;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* NAVBAR */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 30px;
+    background: black;
+}
+
+.nav-left {
+    color: red;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.nav-right a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+}
+
+/* HERO */
+.hero {
+    height: 60vh;
+    background: #111;
+    display: flex;
+    align-items: center;
+    padding-left: 40px;
+}
+
+.hero-content h1 {
+    font-size: 48px;
+}
+
+.hero-btn {
+    display: inline-block;
+    margin-top: 15px;
+    background: red;
+    padding: 12px 20px;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+/* MOVIE SECTION */
+.movie-section {
+    padding: 30px;
+}
+
+.movie-row {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+}
+
+/* MOVIE CARDS (THIS MUST SHOW) */
+.movie-thumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 180px;
+    height: 260px;
+
+    background: #222;
+    border-radius: 10px;
+
+    font-weight: bold;
+    font-size: 18px;
+}
+.movie-thumb {
+    display: block;
+    min-width: 180px;
+    height: 260px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.movie-thumb:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(70, 3, 3, 0.7);
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    padding: 20px;
+    color: #777;
+}
+.player-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 15px;
+}
+
+.player-container h1 {
+    font-size: 32px;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.buy-link {
+    display: inline-block;
+    margin-top: 15px;
+    background: linear-gradient(135deg, red, darkred);
+    color: white;
+    padding: 14px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 0 10px 30px rgba(70, 0, 0, 0.6);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.buy-link:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 40px rgba(70, 0, 0, 0.9);
+}
+
+.player-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 15px;
+}
+
+.player-container h1 {
+    font-size: 32px;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.buy-link {
+    display: inline-block;
+    margin-top: 15px;
+    background: linear-gradient(135deg, red, darkred);
+    color: white;
+    padding: 14px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 0 10px 30px rgba(255, 0, 0, 0.6);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.buy-link:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 40px rgba(255, 0, 0, 0.9);
+}
+
+/* Popup overlay */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  
+  /* Popup box */
+  .popup-content {
+    background: #111;
+    padding: 25px 30px;
+    border-radius: 12px;
+    width: 320px;
+    color: white;
+    text-align: center;
+  }
+  
+  .popup-content input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    margin-top: 10px;
+    border-radius: 6px;
+    border: none;
+  }
+  
+  .popup-content button {
+    margin-top: 15px;
+    padding: 12px 18px;
+    font-size: 16px;
+    background: red;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .popup-content button:hover {
+    background: darkred;
+  }
+  /* ===== MOVIE LOCK OVERLAY ===== */
+.player-container {
+    position: relative;
+  }
+  
+  .lock-overlay {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 60px);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+  
+  .lock-box {
+    text-align: center;
+    color: white;
+  }
+  
+  .lock-box h2 {
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+  
+  .lock-box p {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #ccc;
+  }
+  
+  .lock-box button {
+    background: #e50914;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  
+  .lock-box button:hover {
+    background: #ff1c1c;
+  } 
+  /* Container for each movie group */
+.movie-group {
+    margin-bottom: 40px;
+  }
+  
+  /* Title for each group */
+  .movie-group h2 {
+    color: #fff;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+  
+  /* Scrollable row container */
+  .scroll-row {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding: 10px;
+    scroll-snap-type: x mandatory;
+  }
+  
+  /* Scrollbar style */
+  .scroll-row::-webkit-scrollbar {
+    height: 8px;
+  }
+  
+  .scroll-row::-webkit-scrollbar-thumb {
+    background-color: rgba(255,255,255,0.3);
+    border-radius: 4px;
+  }
+  
+  /* Movie card style */
+  .movie-thumb {
+    flex: 0 0 auto;
+    width: 160px;
+    height: 240px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+    cursor: pointer;
+    scroll-snap-align: start;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  /* Hover effect for cards */
+  .movie-thumb:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.7);
+  }
+  /* Body and page background */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #121212;
+    color: #eee;
+  }
+  
+  /* NAVBAR */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 30px;
+    background-color: #1f1f1f;
+    font-weight: 700;
+    font-size: 18px;
+  }
+  
+  /* HERO (Intro) */
+  .hero {
+    background: linear-gradient(135deg, #ff4e50, #f9d423);
+    padding: 40px 20px;
+    text-align: center;
+    margin-bottom: 30px;
+    border-radius: 12px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .hero-content h1 {
+    font-size: 2.8rem;
+    margin-bottom: 10px;
+    color: #fff;
+  }
+  
+  .hero-content p {
+    font-size: 1.2rem;
+    color: #f0e6d2;
+    margin-top: 0;
+  }
+  
+  /* Movie Group Section Titles */
+  .movie-group h2 {
+    margin-left: 15px;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+
+  
+  /* Scrollbar styling for desktop */
+  .scroll-row::-webkit-scrollbar {
+    height: 8px;
+  }
+  
+  .scroll-row::-webkit-scrollbar-thumb {
+    background-color: rgba(255,255,255,0.2);
+    border-radius: 4px;
+  }
+  
+  /* Movie cards */
+  .movie-thumb {
+    flex: 0 0 auto;
+    width: 160px;
+    height: 240px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    scroll-snap-align: start;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .movie-thumb:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 24px rgba(128, 2, 2, 0.5);
+  }
+  
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 20px 0;
+    background-color: #1f1f1f;
+    margin-top: 40px;
+    font-size: 0.9rem;
+    color: #bbb;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 600px) {
+    .hero-content h1 {
+      font-size: 2rem;
+    }
+    .movie-thumb {
+      width: 120px;
+      height: 180px;
+    }
+  }
+  .scroll-btn {
+    background-color: rgba(255, 0, 0, 0.8);
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 50%;
+    margin: 0 5px;
+    user-select: none;
+    transition: background-color 0.3s;
+  }
+  
+  .scroll-btn:hover {
+    background-color: rgba(255, 0, 0, 1);
+  }
+  
+  .movie-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+ 
+  .scroll-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 1000px; /* same as your rows */
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hero {
+    background: linear-gradient(135deg, #ff4e50, #f9d423);
+    padding: 40px 20px;
+    text-align: center;
+    margin-bottom: 30px;
+    border-radius: 12px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+    color: white;
+    box-shadow: 0 8px 20px rgba(255, 78, 80, 0.5);
+  }
+  
+  .hero-content h1 {
+    font-size: 3.5rem; /* big heading */
+    margin-bottom: 10px;
+    font-weight: 700;
+    text-shadow: 1px 1px 4px rgba(53, 6, 6, 0.5);
+  }
+  
+  .hero-content p {
+    font-size: 1.4rem;
+    color: #f0e6d2;
+    margin-top: 0;
+    text-shadow: 1px 1px 3px rgba(53, 6, 6, 0.5);
+  }
+  
+  /* Hero section */
+.hero {
+  background: linear-gradient(
+    rgba(0, 0, 0, 0.8), 
+    rgba(0, 0, 0, 0.8)
+  ), url('images/classic-movie-bg.jpg') no-repeat center center;
+  background-size: cover;
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #E50914; /* Netflix red */
+  text-align: center;
+  padding: 0 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hero-content h1 {
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 5px black;
+}
+
+.hero-content p {
+  font-size: 1.4rem;
+  margin-bottom: 30px;
+  font-weight: 400;
+  color: #fff; /* White for the subtitle */
+  text-shadow: 1px 1px 3px black;
+}
+
+.btn-primary {
+  background-color: #E50914;
+  color: #fff;
+  padding: 15px 35px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.2rem;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(229, 9, 20, 0.5);
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #b00710;
+}
+
+/* Responsive font sizes */
+@media (max-width: 600px) {
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
+
+  .btn-primary {
+    padding: 12px 25px;
+    font-size: 1rem;
+  }
+}
+.search-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+#searchInput {
+  width: 90%;
+  max-width: 400px;
+  padding: 12px 15px;
+  border-radius: 25px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: #1c1c1c;
+  color: white;
+}
+
+#searchInput::placeholder {
+  color: #aaa;
+}
+/* ================= MOBILE RESPONSIVE ================= */
+@media (max-width: 768px) {
+
+  body {
+    font-size: 14px;
+  }
+
+  h1, h2 {
+    font-size: 18px;
+  }
+
+  /* Movie rows */
+  .scroll-row {
+    gap: 8px;
+    padding: 6px 8px;
+  }
+
+  /* Movie cards */
+  .movie-thumb {
+    min-width: 120px;
+    height: 180px;
+    border-radius: 10px;
+  }
+
+  /* Category titles */
+  .section-title {
+    font-size: 16px;
+    margin-left: 10px;
+  }
+
+  /* Reduce side padding */
+  .movie-group {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  /* Search bar */
+  #searchInput {
+    width: 95%;
+    font-size: 14px;
+  }
+
+}
+.movie-group h2 {
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 1.8rem; /* can increase slightly if needed */
+  color: #fff;       /* ensures it stands out on dark background */
+  text-transform: uppercase; /* optional for streaming feel */
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+.movie-thumb::after {
+  content: attr(data-title);
+  display: block;
+  text-align: center;
+  color: white;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-top: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.movie-group h2 {
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 1.4rem; /* reduced from 1.8rem */
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+}
+

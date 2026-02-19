@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Movie Player</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<!-- NAVBAR -->
+<header class="navbar">
+  <div class="nav-left">Classic Movies Ug</div>
+  <div class="nav-right">
+    <a href="/">Home</a>
+    <a href="/#movie-groups">Movies</a>
+  </div>
+</header>
+
+<!-- PLAYER -->
+<main class="player-container" style="position: relative;">
+  <h1 id="movieTitle">Loading...</h1>
+  <video id="moviePlayer" controls width="100%" poster="">
+    <source id="movieSource" src="" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+
+  <div id="lockOverlay" class="lock-overlay" style="display:none;">
+    <div class="lock-box">
+      <h2>🔒 Preview Ended</h2>
+      <p>Buy to continue watching this movie</p>
+      <button id="overlayBuyBtn">▶ Buy to Continue</button>
+    </div>
+  </div>
+
+  <a href="#" id="buyButton" class="buy-link">▶ Buy Full Movie – UGX 1,500</a>
+  <a href="#" id="downloadLink" class="buy-link" style="display:none; margin-top: 15px;" download>▶ Download / Watch Full Movie</a>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  © 2026 MovieBox+ • Uganda
+</footer>
+
+<!-- PAYMENT POPUP -->
+<div id="paymentPopup" class="popup-overlay" style="display:none;">
+  <div class="popup-content">
+    <h2>Mobile Money Payment</h2>
+    <p>Enter your Mobile Money number to pay UGX 1,500</p>
+    <input type="text" id="mobileNumber" placeholder="e.g. 0700123456" />
+    <button id="payButton">Pay Now</button>
+    <button id="closePopup">Cancel</button>
+    <p id="paymentMessage"></p>
+  </div>
+</div>
+
+<script>
+// ===== GLOBALS =====
+let isUnlocked = false;
+const maxPreviewTime = 15;
+let currentMovie = null;
+
+// ===== HELPERS =====
+function getMovieId() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("movie");
+}
+
+function unlockMovie() {
+  isUnlocked = true;
+  localStorage.setItem('movie_unlocked_' + getMovieId(), 'true');
+  document.getElementById("lockOverlay").style.display = "none";
+  document.getElementById("downloadLink").style.display = "inline-block";
+  document.getElementById("buyButton").style.display = "none";
+}
+
+function checkUnlockStatus() {
+  const movieId = getMovieId();
+  if (localStorage.getItem('movie_unlocked_' + movieId) === 'true') {
+    unlockMovie();
+  } else {
+    document.getElementById("buyButton").style.display = "inline-block";
+    document.getElementById("downloadLink").style.display = "none";
+    document.getElementById("lockOverlay").style.display = "none";
+  }
+}
+
+// ===== PLAYER PREVIEW LOCK =====
+function setupPreviewLock() {
+  const video = document.getElementById("moviePlayer");
+  video.addEventListener("timeupdate", () => {
+    if (!isUnlocked && video.currentTime >= maxPreviewTime) {
+      video.currentTime = maxPreviewTime;
+      video.pause();
+      document.getElementById("lockOverlay").style.display = "flex";
+    }
+  });
+  video.addEventListener("seeking", () => {
+    if (!isUnlocked && video.currentTime > maxPreviewTime) {
+      video.currentTime = maxPreviewTime;
+    }
+  });
+}
+
+// ===== LOAD MOVIE DYNAMICALLY =====
+async function loadMovie() {
+  const movieId = getMovieId();
+  try {
+    const res = await fetch("/movies");
+    const movies = await res.json();
+
+    // Find the movie by its filename (movie_id)
+    currentMovie = movies.find(m => m.movie === movieId);
+    if (!currentMovie) {
+      document.getElementById("movieTitle").textContent = "Movie not found";
+      return;
+    }
+
+    document.title = currentMovie.title + " | MovieBox+";
+    document.getElementById("movieTitle").textContent = currentMovie.title;
+
+    const video = document.getElementById("moviePlayer");
+    const source = document.getElementById("movieSource");
+
+    source.src = "/static/movies/" + currentMovie.movie;
+    video.poster = "/static/images/" + currentMovie.poster;
+    video.load();
+
+    const downloadLink = document.getElementById("downloadLink");
+    downloadLink.href = "/static/movies/" + currentMovie.movie;
+    downloadLink.style.display = "none";
+
+  } catch (error) {
+    console.error("Failed to load movie:", error);
+    document.getElementById("movieTitle").textContent = "Error loading movie";
+  }
+}
+
+// ===== PAYMENT POPUP LOGIC =====
+const buyButton = document.getElementById("buyButton");
+const overlayBuyBtn = document.getElementById("overlayBuyBtn");
+const paymentPopup = document.getElementById("paymentPopup");
+const paymentMessage = document.getElementById("paymentMessage");
+const mobileNumberInput = document.getElementById("mobileNumber");
+const payNowButton = document.getElementById("payButton");
+const closePopup = document.getElementById("closePopup");
+
+function openPaymentPopup() {
+  paymentPopup.style.display = "flex";
+  paymentMessage.textContent = "";
+  mobileNumberInput.value = "";
+}
+
+buyButton.addEventListener("click", e => { e.preventDefault(); openPaymentPopup(); });
+overlayBuyBtn.addEventListener("click", e => { e.preventDefault(); openPaymentPopup(); });
+closePopup.addEventListener("click", () => { paymentPopup.style.display = "none"; });
+
+payNowButton.addEventListener("click", async () => {
+  const phone = mobileNumberInput.value.trim();
+  if (phone.length < 9) {
+    paymentMessage.style.color = "orange";
+    paymentMessage.textContent = "Enter a valid Mobile Money number";
+    return;
+  }
+  paymentMessage.style.color = "black";
+  paymentMessage.textContent = "Processing payment...";
+  try {
+    const movieId = getMovieId();
+    const response = await fetch("/pay", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone: phone, amount: 1500, movie_id: movieId }),
+    });
+    const data = await response.json();
+    if (data.status === "success" && data.data && data.data.link) {
+      window.location.href = data.data.link;
+    } else {
+      paymentMessage.style.color = "red";
+      paymentMessage.textContent = "Payment failed: " + (data.message || "Try again");
+    }
+  } catch (error) {
+    paymentMessage.style.color = "red";
+    paymentMessage.textContent = "Error: " + error.message;
+  }
+});
+
+// ===== VERIFY PAYMENT ON RETURN =====
+async function verifyPayment(tx_ref) {
+  try {
+    const response = await fetch(`/verify/${tx_ref}`);
+    const data = await response.json();
+    if (data.status === "success") unlockMovie();
+    else alert("Payment not verified. Please try again.");
+  } catch (error) {
+    console.error("Payment verification failed", error);
+  }
+}
+
+// ===== INIT =====
+window.onload = async () => {
+  await loadMovie();
+  checkUnlockStatus();
+  setupPreviewLock();
+
+  const params = new URLSearchParams(window.location.search);
+  const tx_ref = params.get("tx_ref");
+  if (tx_ref) verifyPayment(tx_ref);
+};
+</script>
+</body>
+</html>

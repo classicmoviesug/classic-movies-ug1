@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>Test R2 Upload</h2>
+<input type="file" id="fileInput">
+<button onclick="uploadFile()">Upload</button>
+<p id="status"></p>
+
+<script src="https://cdn.jsdelivr.net/npm/@aws-sdk/client-s3/dist/aws-sdk-client-s3.min.js"></script>
+<script>
+async function uploadFile() {
+    const file = document.getElementById("fileInput").files[0];
+    if (!file) return alert("Select a file!");
+
+    const status = document.getElementById("status");
+    status.innerText = "Uploading…";
+
+    // R2 credentials
+    const REGION = "auto"; // Cloudflare uses "auto"
+    const ACCESS_KEY = "d0d9e26fabf5f9837f9fd41759581558";
+    const SECRET_KEY = "d7acac741ba5dafa1de64d6241a34f78e63b1a4830b171e3efb8edb9014eecf3";
+    const BUCKET = "classicmoviesug";
+    const ENDPOINT = "https://a6eec76e8aa35cae59ec6e8fc9d6c38c.r2.cloudflarestorage.com";
+
+    // Using AWS SDK to upload
+    const { S3Client, PutObjectCommand } = window.AwsSdkClientS3;
+    const client = new S3Client({
+        region: REGION,
+        endpoint: ENDPOINT,
+        credentials: { accessKeyId: ACCESS_KEY, secretAccessKey: SECRET_KEY },
+    });
+
+    try {
+        await client.send(new PutObjectCommand({
+            Bucket: BUCKET,
+            Key: file.name,
+            Body: file,
+            ACL: "public-read"
+        }));
+        status.innerText = "✅ Upload successful!";
+        console.log(`File URL: ${ENDPOINT}/${file.name}`);
+    } catch (err) {
+        status.innerText = "❌ Upload failed";
+        console.error(err);
+    }
+}
+</script>
+</body>
+</html>
